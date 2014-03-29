@@ -1,0 +1,50 @@
+a {text-decoration: none;}
+
+.contact-container {
+    width: 80%;
+    position: absolute;
+    bottom: 0;
+}
+
+.contact {
+    width: 100%;
+    text-align: center;
+}
+
+.pop-container {
+    position: relative;
+    background: rgb(0,0,0);
+    background: rgba(0,0,0,0.5);
+    width:300px;
+    height:200px;
+    margin: 0 auto;
+    bottom: 25px;
+}
+.pop-container:after {
+    position: absolute;
+    content:"";
+    width: 0; 
+	height: 0; 
+    left:50%;
+    margin-left:-20px;
+	border-left: 20px solid transparent;
+	border-right: 20px solid transparent;	
+	border-top: 20px solid rgba(0,0,0,0.5);
+}
+
+.pop {
+    position: relative;
+    width: 90%;
+    height:100%;
+    margin: 0 auto;
+}
+
+.icon-container {
+    position: absolute;
+    width: 100%;
+    bottom: 0;
+}
+.icons {
+    text-align: center;
+}
+.icon {display: inline-block;}
