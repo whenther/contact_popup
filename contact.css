@@ -1,5 +1,12 @@
+/* General */
+body {margin: 0;}
 a {text-decoration: none;}
+.warn {
+    color: #990000;
+    display: none;
+}
 
+/* Contact text + popup */
 .contact-container {
     width: 80%;
     position: absolute;
@@ -11,12 +18,83 @@ a {text-decoration: none;}
     text-align: center;
 }
 
+/* Pop-up */
 .pop-container {
-    position: relative;
+    position: fixed;
     background: rgb(0,0,0);
     background: rgba(0,0,0,0.5);
+    width:100%;
+    min-height:100%;
+    margin: 0;
+    bottom: 0;
+    font-family: sans-serif;
+    color: white;
+    font-size: .85em;
+}
+
+.pop {
+    width: 90%;
+    height:100%;
+    margin: 0 auto;
+}
+
+/* Email Me */
+form {
+    padding: 10px 0;
+}
+#email-from {
+    width: 100%;
+}
+.email-label {
+    padding: 10px 0;
+    margin: 0;
+}
+textarea {
+    width: 100%;
+    max-width: 100%;
+    margin: 5px 0;
+    padding: 5px;
+    border:0;
+    height: 200px;
+    resize: none;
+    font-family: sans-serif;
+    /* make padding internal */
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.submit {
+    padding: 8px;
+}
+input {
+    border: 0;
+    padding: 3px;
+    margin: 5px auto;
+    display: block;
+    width: 100%;
+    font-size: 1.1em;
+    /* make padding internal */
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/* Socail Media */
+.icon-container {
+    width: 100%;
+    padding-bottom: 10px;
+    text-align: center;
+}
+.icons {
+    text-align: center;
+}
+.icon {display: inline-block;}
+
+@media screen and (min-width: 380px) {
+.pop-container {
+    position: relative;
     width:300px;
-    height:200px;
+    min-height:200px;
     margin: 0 auto;
     bottom: 25px;
 }
@@ -31,20 +109,4 @@ a {text-decoration: none;}
 	border-right: 20px solid transparent;	
 	border-top: 20px solid rgba(0,0,0,0.5);
 }
-
-.pop {
-    position: relative;
-    width: 90%;
-    height:100%;
-    margin: 0 auto;
 }
-
-.icon-container {
-    position: absolute;
-    width: 100%;
-    bottom: 0;
-}
-.icons {
-    text-align: center;
-}
-.icon {display: inline-block;}

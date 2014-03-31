@@ -9,12 +9,25 @@
 <body>
     <div class='contact-container'>
         <div class="pop-container"><div class="pop">
-            <div class="icon-container"><div class="icons">
-                <a class='icon'><img src="icons/email.png"></a>
-                <a class='icon'><img src="icons/flickr.png"></a>
-                <a class='icon'><img src="icons/github.png"></a>
-                <a class='icon'><img src="icons/linkedin.png"></a>
-                <a class='icon'><img src="icons/twitter.png"></a>
+            <form>
+                <p class="email-label">
+                    Looking for an employee or freelancer?
+                    Want to work on an open-source project?
+                    Just want to talk shop? Shoot me an email!
+                </p>
+                <input type="test" name="email-from" id="email-from" placeholder="Your email address"/>
+                <span class="warn">Please enter a valid email address.</span>
+                <textarea id="email"></textarea>
+                <span class="warn">Please enter a message.</span>
+                <input class="submit" type="button" value="Submit"/>
+            </form>
+            <div class="icon-container">
+                <p>Follow me on social media!</p>
+                <div class="icons">
+                <a class='icon' href="http://flickr.com" target="_blank"><img src="icons/flickr.png"></a>
+                <a class='icon' href="http://github.com" target="_blank"><img src="icons/github.png"></a>
+                <a class='icon' href="http://linkedin.com" target="_blank"><img src="icons/linkedin.png"></a>
+                <a class='icon' href="http://twitter.com" target="_blank"><img src="icons/twitter.png"></a>
             </div></div>
         </div></div>
         <div class="contact">Contact me</div>
