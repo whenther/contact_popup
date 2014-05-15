@@ -177,15 +177,15 @@
 //  A function to display temporary messages in the middle of a div //
 //////////////////////////////////////////////////////////////////////
   $.fn.showCenteredMessage = function(message, options) {
-    var msg$ = $('<div class="pop-message">' + message + '</div>');
-    
-    var settings = $.extend({
+    var msg$ = $('<div class="pop-message">' + message + '</div>'),
+    settings = $.extend({
       backColorFallback: 'rgb(30,30,30)',
       backColor:         'rgba(0,0,0,0.5)',
       textColor:          'white',
-      fontFamilies:       'sans-serif'
+      fontFamilies:       'sans-serif',
+      fadeWait:           '1000',
+      callback:           null
     },options||{});
-    
     
     msg$.css({
       'background-color': settings.backColor,
@@ -208,9 +208,17 @@
       'margin-top': '-' + msg$.height()/2 + 'px',
       'margin-left': '-' + msg$.width()/2 + 'px'
     });
+    // hide, so the message can fade in
     msg$.hide();
+    
+    // fade in, then fade out after a second.
     msg$.fadeIn('slow',function() {
-      msg$.fadeOut('slow');
+      window.setTimeout(function () {
+        msg$.fadeOut('slow',function () {
+          settings.callback();
+          msg$.remove();
+        });
+      }, settings.fadeWait);
     });
     
     return this;
@@ -226,13 +234,13 @@
   $.fn.addContactPop = function(options) {
     // options hash
     var settings = $.extend({
-      emailUrl:   null,
-      emailMsg:   null,
+      emailUrl:     null,
+      emailMsg:     null,
       warningColor: '#B20000',
-      socialUrls: {},
-      socialMsg:  null,
-      socialDir:  '',
-      testMode:    false,
+      socialUrls:   {},
+      socialMsg:    null,
+      socialDir:    '',
+      testMode:     false,
       // CenterPop.js options
       overlayColorFallback:   'rgb(100,100,100)',
       overlayColor:           'rgba(0,0,0,0.5)',
@@ -242,7 +250,8 @@
       mobileColor:            'rgba(0,0,0,0.7)',
       textColor:              'white',
       fontFamilies:           'sans-serif'
-    },options||{});
+    },options||{}),
+    pop$;
     
     ////////////////
     // Functions
@@ -356,7 +365,10 @@
     
     // display a warning
     function showWarnings(fields) {
-      pop$.find(fields).addClass('contact-warning');
+      if (fields) {
+        pop$.find(fields).addClass('contact-warning');
+        displayMessage('Please complete the email before sending.');
+      }
     }
     // remove a warning
     function hideWarnings(fields) {
@@ -364,8 +376,8 @@
     }
     
     // Display a server message
-    function displayServerMessage() {
-      
+    function displayMessage(message, callback) {
+      pop$.showCenteredMessage(message, callback);
     }
     
     // validate the email side
@@ -391,7 +403,7 @@
       }
       else {
         if (okayFields !== '') okayFields += ', ';
-        okayFields = '#email';
+        okayFields += '#email';
       }
       
       // update warnings
@@ -404,6 +416,9 @@
       if (settings.testMode) {
         console.log('Url: ' + settings.emailUrl);
         console.log(pop$.find('.email-form').serialize());
+        displayMessage('Test complete!', {
+          callback: clearEmail
+        });
       }
       else {
         $.post(
@@ -411,15 +426,20 @@
           pop$.find('.email-form').serialize(),
           function(response){
             if (response.sent) {
-              // DISPLAY SENT
+              // Display success message
+              displayMessage('Email sent!', {
+                callback: clearEmail
+              });
             }
             else {
               validateEmail();
               if (response.message) {
-                // DISPLAY MESSAGE
+                // Display server's message
+                displayMessage(response.message);
               }
               else {
                 // DISPLAY DEFAULT MESSAGE
+                displayMessage('A server error occured. Please try again.');
               }
             }
           },
@@ -450,12 +470,18 @@
         sendEmailRequest();
       }
     }
+    // CLear the email fields
+    function clearEmail() {
+      var emailFields = '#email-from, #email';
+      pop$.find(emailFields).val('');
+      hideWarnings(emailFields);
+    }
     
     ////////////////
     // Main
     ////////////////
     // set up pop-up
-    var pop$ = $('#contact').addCenterPop({
+    pop$ = $('#contact').addCenterPop({
       overlayColorFallback:   settings.overlayColorFallback,
       overlayColor:           settings.overlayColor,
       containerColorFallback: settings.containerColorFallback,
