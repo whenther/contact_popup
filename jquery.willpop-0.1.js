@@ -1,6 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 //  jQuery.AWill.js                                                 //
 //  A jQuery library by Will Lee-Wagner                             //
+//  Updated 2014-05-17
 //  whentheresawill.net                                             //
 //////////////////////////////////////////////////////////////////////
 (function ($) {
@@ -23,7 +24,10 @@
       mobileColorFallback:    'rgb(70,70,70)',
       mobileColor:            'rgba(0,0,0,0.7)',
       textColor:              'white',
-      fontFamilies:           'sans-serif'
+      fontFamilies:           'sans-serif',
+      innerClickClose:        false,
+      onOpen:                 null,
+      onClose:                null
     },options||{});
     
     
@@ -33,8 +37,8 @@
     
     // build the sytlesheet for the popup
     // This keeps the user from having to add in a seperate sheet
-    function styleSheet() {
-      sheet = '<style class="jquery-pop">\
+    function addStyleSheet() {
+      var sheet = '<style class="jquery-pop">\
       body {margin:0;}\
       .pop-overlay {\
           background-color:' + settings.overlayColorFallback + ';\
@@ -66,7 +70,6 @@
           margin: 0 auto;\
       }\
       @media screen and (max-width: 500px) {\
-        .pop-up {position:fixed;}\
         .pop-overlay {background-color: none;}\
         .pop-container {\
             background-color:' + settings.mobileColorFallback + ';\
@@ -86,7 +89,7 @@
             }\
       }</style>';
       
-      return sheet;
+      $('head').append(sheet);
     }
     
     // set height of pop-up based on height of interior
@@ -136,11 +139,20 @@
     function popUp() {
       // set height. Do this every time, in case the window changed
       setHeight();
+      // run the open function (if any)
+      if (settings.onOpen)
+        settings.onOpen(this);
       pop$.fadeIn('fast');
     }
     // close popup
     function popDown() {
-      pop$.fadeOut('fast',removeHeight);
+      pop$.fadeOut('fast',function () {
+        // remove the height of the inner pop
+        removeHeight();
+        // run the open function (if any)
+        if (settings.onClose)
+          settings.onClose(this);
+      });
     }
     
     ////////////////
@@ -152,7 +164,7 @@
     $('body').append(pop$);
     
     // append stylesheet
-    $('head').append(styleSheet());
+    addStyleSheet();
     
     ////////////////
     // Listeners
@@ -162,9 +174,11 @@
     // click pop to bring it back down
     pop$.click(popDown);
     // stop clicks on the container from bringing down the popup
-    pop$.find('.pop-container').click(function (e) {
-      e.stopPropagation();
-    });
+    if (!(settings.innerClickClose)) {
+      pop$.find('.pop-container').click(function (e) {
+        e.stopPropagation();
+      });
+    }
     
     // return the internal div of the popup
     // users can append content to this div
@@ -234,13 +248,15 @@
   $.fn.addContactPop = function(options) {
     // options hash
     var settings = $.extend({
-      emailUrl:     null,
-      emailMsg:     null,
-      warningColor: '#B20000',
-      socialUrls:   {},
-      socialMsg:    null,
-      socialDir:    '',
-      testMode:     false,
+      emailUrl:           null,
+      emailMsg:           null,
+      warningColor:       '#B20000',
+      socialUrls:         {},
+      socialDefaultIcon:  'link',
+      socialAnimate:      true,
+      socialMsg:          null,
+      socialDir:          '',
+      testMode:           false,
       // CenterPop.js options
       overlayColorFallback:   'rgb(100,100,100)',
       overlayColor:           'rgba(0,0,0,0.5)',
@@ -281,11 +297,25 @@
         pop += '<div class="icons">';
         // add social buttons
         for (var i in settings.socialUrls) {
-          var name = i;
-          var url = settings.socialUrls[i];
+          var name = i,
+            url, file;
           
-          // TODO: ADD DEFAULT ICON
-          pop += '<a class="icon" href="'+ url + '" target="_blank"><img src="' + settings.socialDir + name + '.png"></a>';
+          // Check if the user sent in an array with a filename or not
+          if ($.isArray(settings.socialUrls[i])) {
+            // get the filename and the url
+            url = settings.socialUrls[i][0],
+            file = settings.socialUrls[i][1];
+          }
+          else {
+            // get the url and set the filename to the regular name
+            url  = settings.socialUrls[i];
+            file = name;
+          }
+          // set up the icon's HTML
+          pop += '\
+            <a class="icon" href="'+ url + '" target="_blank">\
+              <img src="' + settings.socialDir + file + '.png" title="' + name + '">\
+            </a>';
         }
         pop += '</div></div>';
       }
@@ -295,7 +325,7 @@
     
     // build the sytlesheet for the popup
     function styleSheet() {
-      sheet = '<style class="jquery-contact">\
+      var sheet = '<style class="jquery-contact">\
         .pop a {text-decoration: none;}\
         .pop {font-size: 1.2em;}\
         /* email form */\
@@ -359,8 +389,8 @@
           padding: 0 1%;\
         }\
         </style>';
-      
-      return sheet;
+        
+      $('head').append(sheet);
     }
     
     // display a warning
@@ -494,7 +524,7 @@
     // Append HMTL to popup object
     pop$.append(markup());
     // Append stylesheet
-    $('head').append(styleSheet());
+    addStyleSheet();
     
     ////////////////
     // Listeners
@@ -504,7 +534,8 @@
     pop$.find('form').submit(sendEmail);
     
     // enlarge icons on hover
-    pop$.find('.icon img').hover(imgBig, imgSml);
+    if (settings.socialAnimate)
+      pop$.find('.icon img').hover(imgBig, imgSml);
     
     // return wrapped set
     return this;
