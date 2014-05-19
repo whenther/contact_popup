@@ -1,7 +1,6 @@
 //////////////////////////////////////////////////////////////////////
 //  jQuery.AWill.js                                                 //
 //  A jQuery library by Will Lee-Wagner                             //
-//  Updated 2014-05-17
 //  whentheresawill.net                                             //
 //////////////////////////////////////////////////////////////////////
 (function ($) {
@@ -191,50 +190,87 @@
 //  A function to display temporary messages in the middle of a div //
 //////////////////////////////////////////////////////////////////////
   $.fn.showCenteredMessage = function(message, options) {
-    var msg$ = $('<div class="pop-message">' + message + '</div>'),
+    var msg$, padding = 5,
     settings = $.extend({
       backColorFallback: 'rgb(30,30,30)',
       backColor:         'rgba(0,0,0,0.5)',
       textColor:          'white',
       fontFamilies:       'sans-serif',
       fadeWait:           '1000',
+      fadeSpeed:          'slow',
+      className:          null,
+      fadeOut:            true,
       callback:           null
     },options||{});
     
-    msg$.css({
+    // run the callback, if specified
+    function runCallback() {
+      if (settings.callback)
+        settings.callback();
+    }
+    
+    // Build the HTML for the message
+    function msgHTML() {
+      // add class if specified. This is good for refering to the message later,
+      // or styleing it further
+      var msg;
+      
+      if (settings.className)
+        msg = '<div class="' + settings.className + '">' + message + '</div>';
+      else
+        msg = '<div>' + message + '</div>';
+      
+      return msg;
+    }
+    
+    // build and style the message
+    msg$ = $(msgHTML()).css({
       'background-color': settings.backColor,
       'color': settings.textColor,
       'font-family': settings.fontFamilies,
       'text-align': 'center',
       'border-radius': '20px',
-      'position': 'fixed',
+      'position': 'absolute',
       'top': '50%',
       'left': '50%',
-      'padding': '5px',
+      'padding': padding + 'px',
       'min-width': '100px'
     });
     // append the message to the given element
-    // this will calculate the size of the pop
+    // this will calculate the size of the message
     this.append(msg$);
     
-    // adjust the placement of the message
+    // adjust the placement of the message to center it exactly
+    // Do this now, after the message has dimensions from the DOM
     msg$.css({
       'margin-top': '-' + msg$.height()/2 + 'px',
-      'margin-left': '-' + msg$.width()/2 + 'px'
-    });
+      'margin-left': '-' + (msg$.width()/2 + padding) + 'px'
+    })
     // hide, so the message can fade in
-    msg$.hide();
+    .hide()
     
-    // fade in, then fade out after a second.
-    msg$.fadeIn('slow',function() {
-      window.setTimeout(function () {
-        msg$.fadeOut('slow',function () {
-          settings.callback();
-          msg$.remove();
-        });
-      }, settings.fadeWait);
+    // fade in
+    .fadeIn(settings.fadeSpeed,function() {
+      // If fadeout requested:
+      if (settings.fadeOut) {
+        // After specified timeout:
+        window.setTimeout(function () {
+          // Fade back out
+          msg$.fadeOut(settings.fadeSpeed,function () {
+            // After fadeout, run given callback
+            runCallback();
+            // remove the popup from the DOM
+            msg$.remove();
+          });
+        }, settings.fadeWait);
+      }
+      // If no fadeOut, just run the callback
+      else {
+        runCallback();
+      }
     });
     
+    // Return the original element
     return this;
   };
 
@@ -324,7 +360,7 @@
     }
     
     // build the sytlesheet for the popup
-    function styleSheet() {
+    function addStyleSheet() {
       var sheet = '<style class="jquery-contact">\
         .pop a {text-decoration: none;}\
         .pop {font-size: 1.2em;}\
@@ -405,19 +441,20 @@
       pop$.find(fields).removeClass('contact-warning');
     }
     
-    // Display a server message
+    // Display a message
     function displayMessage(message, callback) {
       pop$.showCenteredMessage(message, callback);
     }
     
     // validate the email side
     function validateEmail() {
-      var problemFields = '',
+      var email, problemFields = '',
           okayFields = '',
           validated = true;
       
       // check email
-      if (pop$.find('#email-from').val() === '') {
+      email = pop$.find('#email-from').val();
+      if (!(email.match(/.+@.+\..+/))) {
         problemFields = '#email-from';
         validated = false;
       }
