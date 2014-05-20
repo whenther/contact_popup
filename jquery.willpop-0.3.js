@@ -230,6 +230,7 @@
       'font-family': settings.fontFamilies,
       'text-align': 'center',
       'border-radius': '20px',
+      'position': 'absolute',
       'padding': padding + 'px',
       'min-width': '100px',
       'max-width': containerWidth - padding*4 + 'px'
@@ -248,7 +249,6 @@
     // This includes setting it to position: absolute
     // Do this now, after the message has dimensions from the DOM
     css = {
-      'position': 'absolute',
       'margin-top': '-' + msgHeight/2 + 'px',
       'top': '50%',
       'left': '50%'
@@ -500,9 +500,7 @@
       if (settings.testMode) {
         console.log('Url: ' + settings.emailUrl);
         console.log(pop$.find('.email-form').serialize());
-        displayMessage('Test complete!', {
-          callback: clearEmail
-        });
+        displayMessage('Email sent!', clearEmail);
       }
       else {
         $.post(
@@ -511,9 +509,7 @@
           function(response){
             if (response.sent) {
               // Display success message
-              displayMessage('Email sent!', {
-                callback: clearEmail
-              });
+              displayMessage('Email sent!', clearEmail);
             }
             else {
               validateEmail();
@@ -554,7 +550,7 @@
         sendEmailRequest();
       }
     }
-    // CLear the email fields
+    // Clear the email fields
     function clearEmail() {
       var emailFields = '#email-from, #email';
       pop$.find(emailFields).val('');
