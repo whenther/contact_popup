@@ -460,7 +460,7 @@
     
     // Display a message
     function displayMessage(message, callback) {
-      pop$.showCenteredMessage(message, {'callback': callback, 'fadeOut': false});
+      pop$.showCenteredMessage(message, {'callback': callback});
     }
     
     // validate the email side
