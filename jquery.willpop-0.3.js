@@ -190,7 +190,7 @@
 //  A function to display temporary messages in the middle of a div //
 //////////////////////////////////////////////////////////////////////
   $.fn.showCenteredMessage = function(message, options) {
-    var msg$, padding = 5,
+    var msg$, padding = 5, msgHeight, msgWidth, containerWidth = this.width(), css,
     settings = $.extend({
       backColorFallback: 'rgb(30,30,30)',
       backColor:         'rgba(0,0,0,0.5)',
@@ -230,22 +230,39 @@
       'font-family': settings.fontFamilies,
       'text-align': 'center',
       'border-radius': '20px',
-      'position': 'absolute',
-      'top': '50%',
-      'left': '50%',
       'padding': padding + 'px',
-      'min-width': '100px'
+      'min-width': '100px',
+      'max-width': containerWidth - padding*4 + 'px'
     });
-    // append the message to the given element
+    // Append the message to the given element
     // this will calculate the size of the message
+    // Since it's set to fixed width, the size will not be affected by
+    // surrounding margins
     this.append(msg$);
     
-    // adjust the placement of the message to center it exactly
+    // Get dimensions, now that the message has them from being appended
+    msgWidth = msg$.width();
+    msgHeight = msg$.height();
+    
+    // Adjust the placement of the message to center it exactly
+    // This includes setting it to position: absolute
     // Do this now, after the message has dimensions from the DOM
-    msg$.css({
-      'margin-top': '-' + msg$.height()/2 + 'px',
-      'margin-left': '-' + (msg$.width()/2 + padding) + 'px'
-    })
+    css = {
+      'position': 'absolute',
+      'margin-top': '-' + msgHeight/2 + 'px',
+      'top': '50%',
+      'left': '50%'
+    };
+    // conditional, depending on size
+    if (msgWidth >= containerWidth) {
+      css['margin-left'] = '0';
+      css['width']= containerWidth + 'px';
+    }
+    else {
+      css['margin-left'] = '-' + (msgWidth/2 + padding) + 'px';
+    }
+    // Add css to msg
+    msg$.css(css)
     // hide, so the message can fade in
     .hide()
     
@@ -443,7 +460,7 @@
     
     // Display a message
     function displayMessage(message, callback) {
-      pop$.showCenteredMessage(message, callback);
+      pop$.showCenteredMessage(message, {'callback': callback, 'fadeOut': false});
     }
     
     // validate the email side
