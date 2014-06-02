@@ -4,7 +4,7 @@ jQuery.WillPop.js
 A jQuery plugin library focused on popups. 
 
 For examples, see:
-[Uses addContactPop](http://whentheresawill.net)
+[Uses addContactPop](http://whentheresawill.net)  
 [Uses addCenterPop and showCenteredMessage](http://www.sfyd.org/june_2014_slate)
 
 
