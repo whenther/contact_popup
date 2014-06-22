@@ -86,6 +86,7 @@
           height:100%;\
           margin: 0 auto;\
       }\
+      .pop .email-form input, textarea {color: #242424;}\
       @media screen and (max-width: ' + (settings.popWidth+POP_RESPONSIVE_PADDING) + 'px) {\
         .pop-overlay {background-color: none;}\
         .pop-container {\
@@ -590,10 +591,13 @@
         displayMessage('Email sent!', clearEmail);
       }
       else {
-        $.post(
-          settings.emailUrl,
-          pop$.find('.email-form').serialize(),
-          function(response){
+        $.ajax({
+          type: 'POST',
+          url: settings.emailUrl,
+          contentType: "application/json",
+          data: pop$.find('.email-form').serialize(),
+          //crossDomain: settings.crossDomain,
+          success: function(response){
             if (response.sent) {
               // Display success message
               displayMessage('Email sent!', clearEmail);
@@ -610,8 +614,10 @@
               }
             }
           },
-          "json"
-        );
+          error: function (err) {
+            displayMessage(err);
+          }
+        });
       }
     }
     
@@ -701,6 +707,7 @@
       socialMsg:          null,
       socialDir:          '',
       testMode:           false,
+      crossDomain:        false
     });
       
   })();
