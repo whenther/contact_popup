@@ -1,7 +1,7 @@
 /**
  * jQuery WillPop
  * @overview A library of pop-up related jQuery plugin functions
- * @version 1.0.0
+ * @version 1.0.1
  * @author Will Lee-Wagner <will@whentheresawill.net>
  * @license MIT <http://opensource.org/licenses/mit-license.php>
  */
